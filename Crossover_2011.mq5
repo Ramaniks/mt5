@@ -18,7 +18,7 @@
 #property link "ramaniks79@gmail.com" 
 //---- indicator version
 #property version   "1.00"
-#include <Trade\Trade.mqh>
+//#include <Trade\Trade.mqh>
 #include <Expert\Expert.mqh>
 #include <Expert\ExpertSignal.mqh>
 #include <Expert\Trailing\TrailingNone.mqh>
@@ -33,35 +33,40 @@ input bool   SenderOrder                   = false;
 input bool   LogsStatus                    = false;
 input ENUM_APPLIED_PRICE AppliedPrice      = PRICE_CLOSE;
 input double Lot                           = 0.02; // Lots to trade
-input int    EMA1                          = 5;//Linha de base
-input int    EMA2                          = 13;//Primeiro Cruzamento
-input int    EMA3                          = 50;//Segundo Cruzamento
-input int    EMA4                          = 72;//Terceiro Cruzamento
-input int    EMA5                          = 200;//Quarto Cruzamento
-input int    EMA6                          = 800;//Grande Cruzamento
-input int    EMAMain                       = 5;//Linha de base
-input int    EMAPrim                       = 13;//Primeiro Cruzamento
-input int    EMASec                        = 50;//Segundo Cruzamento
-input int    EMA4_1                        = 72;//Terceiro Cruzamento
-input int    EMATerc                       = 200;//Quarto Cruzamento
-input int    EMAQuat                       = 800;//Grande Cruzamento
+//input int    EMA1                          = 5;//Linha de base
+//input int    EMA2                          = 13;//Primeiro Cruzamento
+//input int    EMA3                          = 50;//Segundo Cruzamento
+//input int    EMA4                          = 72;//Terceiro Cruzamento
+//input int    EMA5                          = 200;//Quarto Cruzamento
+//input int    EMA6                          = 800;//Grande Cruzamento
+input ENUM_MA_METHOD SignalMainMode          = MODE_EMA;
+input int    SignalMain                      = 5;//Linha de base
+input ENUM_MA_METHOD Signal1Mode             = MODE_EMA;
+input int    Signal1                         = 13;//Primeiro Cruzamento
+input ENUM_MA_METHOD Signal2Mode             = MODE_SMA;
+input int    Signal2                         = 50;//Segundo Cruzamento
+//input int    EMA4_1                        = 72;//Terceiro Cruzamento
+input ENUM_MA_METHOD Signal3Mode             = MODE_SMA;
+input int    Signal3                         = 200;//Quarto Cruzamento
+input ENUM_MA_METHOD Signal4Mode             = MODE_SMA;
+input int    Signal4                         = 800;//Grande Cruzamento
 //--- inputs for money
 input double Inp_Money_FixLot_Percent        =100.0;
 input double Inp_Money_FixLot_Lots           =0.02;
 //+---------------------------------------------------------------+
 input string            Symb0 = "EURUSD";
 input  bool            Trade0 = true;
-input int                Per0 = 15;
+//input int                Per0 = 15;
 input ENUM_APPLIED_PRICE ApPrice0=PRICE_CLOSE;
-input ENUM_MA_METHOD ModeMA   = MODE_EMA;
-input int             StLoss0 = 0;//1000
-input int           TkProfit0 = 0;//2000
+//input ENUM_MA_METHOD ModeMA   = MODE_EMA;
+input int             StLoss0 = 1000;//1000
+input int           TkProfit0 = 2000;//2000
 input double            Lots0 = 0.02;
 input int           Slippage0 = 30;
 //+---------------------------------------------------------------+
 input string            Symb1 = "USDCHF";
 input  bool            Trade1 = true;
-input int                Per1 = 15;
+//input int                Per1 = 15;
 input ENUM_APPLIED_PRICE ApPrice1=PRICE_CLOSE;
 input int             StLoss1 = 0;
 input int           TkProfit1 = 0;
@@ -70,7 +75,7 @@ input int           Slippage1 = 30;
 //+---------------------------------------------------------------+
 input string            Symb2 = "USDJPY";
 input  bool            Trade2 = true;
-input int                Per2 = 15;
+//input int                Per2 = 15;
 input ENUM_APPLIED_PRICE ApPrice2=PRICE_CLOSE;
 input int             StLoss2 = 0;
 input int           TkProfit2 = 0;
@@ -79,7 +84,7 @@ input int           Slippage2 = 30;
 //+---------------------------------------------------------------+
 input string            Symb3 = "USDCAD";
 input  bool            Trade3 = true;
-input int                Per3 = 15;
+//input int                Per3 = 15;
 input ENUM_APPLIED_PRICE ApPrice3=PRICE_CLOSE;
 input int             StLoss3 = 0;
 input int           TkProfit3 = 0;
@@ -88,7 +93,7 @@ input int           Slippage3 = 30;
 //+---------------------------------------------------------------+
 input string            Symb4 = "AUDUSD";
 input  bool            Trade4 = true;
-input int                Per4 = 15;
+//input int                Per4 = 15;
 input ENUM_APPLIED_PRICE ApPrice4=PRICE_CLOSE;
 input int             StLoss4 = 0;
 input int           TkProfit4 = 0;
@@ -97,7 +102,7 @@ input int           Slippage4 = 30;
 //+---------------------------------------------------------------+
 input string            Symb5 = "GBPUSD";
 input  bool            Trade5 = true;
-input int                Per5 = 15;
+//input int                Per5 = 15;
 input ENUM_APPLIED_PRICE ApPrice5=PRICE_CLOSE;
 input int             StLoss5 = 0;
 input int           TkProfit5 = 0;
@@ -109,13 +114,13 @@ int maMain, maPrimario, maSecundario, maTerciario, maQuaternario;
 double dmaMain[], dmaPrimario[], dmaSecundario[], dmaTerciario[], dmaQuaternario[];
 //Tendencia of Moving Average
 bool tendPrimario, tendSecundario, tendTerciario;
-
+//Contador para verificação e testes
 int contaPrimario, contaSecundario, contaTerciario;
 
 //+------------------------------------------------------------------+
 //| Global expert object                                             |
 //+------------------------------------------------------------------+
-CExpert ExtExpert;
+//CExpert ExtExpert;
 //+------------------------------------------------------------------+
 //| IsNewBar() function                                              |
 //+------------------------------------------------------------------+
@@ -185,8 +190,8 @@ bool TradeSignalCounter
    string word="";
    //---- check if trade is prohibited
    if(!Trade)return(true);
-   StringConcatenate(word,"L1: Trade:",Trade," return ",!Trade);
-   if(LogsStatus==true) Print(word);
+   //StringConcatenate(word,"L1: Trade:",Trade," return ",!Trade);
+   //if(LogsStatus==true) Print(word);
 
 //---- declare variable to store final size of variables arrays
    //static int Size_=0;
@@ -196,19 +201,20 @@ bool TradeSignalCounter
    if(IsNewBar(Number,Symbol_,0))
    {
       //--- fill the structure with parameters of the indicator
-      maMain    =iMA(_Symbol,Period(),EMAMain,0,ModeMA,ApPrice);
+      maMain    =iMA(Symbol_,Period(),SignalMain,0,SignalMainMode,ApPrice);
       CopyBuffer(maMain,0,0,5,dmaMain);
-      maPrimario     =iMA(_Symbol,Period(),EMAPrim,0,ModeMA,ApPrice);
+      maPrimario     =iMA(Symbol_,Period(),Signal1,0,Signal1Mode,ApPrice);
       CopyBuffer(maPrimario,0,0,5,dmaPrimario);
-      maSecundario   =iMA(_Symbol,Period(),EMASec,0,ModeMA,ApPrice);
+      maSecundario   =iMA(Symbol_,Period(),Signal2,0,Signal2Mode,ApPrice);
       CopyBuffer(maSecundario,0,0,5,dmaSecundario);
-      maTerciario    =iMA(_Symbol,Period(),EMATerc,0,ModeMA,ApPrice);
+      maTerciario    =iMA(Symbol_,Period(),Signal3,0,Signal3Mode,ApPrice);
       CopyBuffer(maTerciario,0,0,5,dmaTerciario);
-      maQuaternario  =iMA(_Symbol,Period(),EMAQuat,0,ModeMA,ApPrice);
+      maQuaternario  =iMA(Symbol_,Period(),Signal4,0,Signal4Mode,ApPrice);
       CopyBuffer(maQuaternario,0,0,5,dmaQuaternario);
       //Validações para entrada
       //Se o sinal rapido(Primario) for maior que o lento(Segundo) então Sinal de compra.
       //Se o sinal rapido(Primario) for menor que o lento(Segundo) então Sinal de venda.
+      //Verificar para colocar a diferença em termo de afastamento tipo 10%. Mas tem que fazer teste de mesa antes.
       if(dmaMain[4] > dmaPrimario[4]) sigPrimario  = true; else sigPrimario = false;
       if(dmaPrimario[4] > dmaSecundario[4]) sigSecundario = true; else sigSecundario = false;
       if(dmaSecundario[4] > dmaTerciario[4]) sigTerciario = true; else sigTerciario = false;
@@ -320,7 +326,7 @@ int OnInit()
    contaSecundario = 0;
    contaTerciario = 0;
 //--- Initializing expert
-   if(!ExtExpert.Init(Symbol(),Period(),Expert_EveryTick,Expert_MagicNumber))
+   /*if(!ExtExpert.Init(Symbol(),Period(),Expert_EveryTick,Expert_MagicNumber))
      {
       //--- failed
       printf(__FUNCTION__+": error initializing expert");
@@ -345,7 +351,7 @@ int OnInit()
       return(-6);
      }
 //--- Set trailing parameters
-   trailing.
+   //trailing.
 //--- Check trailing parameters
    if(!trailing.ValidationSettings())
      {
@@ -381,7 +387,7 @@ int OnInit()
       printf(__FUNCTION__+": error money parameters");
       ExtExpert.Deinit();
       return(-10);
-     }
+     }*/
 
 //----
    return(0);
@@ -405,7 +411,7 @@ void OnTick()
    static bool UpSignal[6],DnSignal[6],UpStop[6],DnStop[6];
 
 //---- get trade signals
-   TradeSignalCounter(0,Symb0,Trade0,Per0,ApPrice0,UpSignal,DnSignal,UpStop,DnStop);
+   TradeSignalCounter(0,Symb0,Trade0,/*,Per0*/15,ApPrice0,UpSignal,DnSignal,UpStop,DnStop);
    //TradeSignalCounter(1,Symb1,Trade1,Per1,ApPrice1,UpSignal,DnSignal,UpStop,DnStop);
    //TradeSignalCounter(2,Symb2,Trade2,Per2,ApPrice2,UpSignal,DnSignal,UpStop,DnStop);
    //TradeSignalCounter(3,Symb3,Trade3,Per3,ApPrice3,UpSignal,DnSignal,UpStop,DnStop);
